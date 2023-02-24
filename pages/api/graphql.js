@@ -35,7 +35,7 @@ const server = new ApolloServer({
   resolvers,
   plugins: [ApolloServerPluginLandingPageGraphQLPlayground({})],
   cors: {
-    origin: 'https://blog-nu-neon.vercel.app/',
+    origin: '/',
     credentials: true,
   },
   context: async ({ req, res }) => {

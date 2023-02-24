@@ -10,7 +10,7 @@ const errorLink = onError(
       graphQLErrors.forEach(async ({ message, locations, path }) => {
         if (message === EXPIRE_MESSAGE) {
           await fetch(
-            'https://blog-nu-neon.vercel.app/api/server?query={reAuth{acessToken}}',
+            '/api/server?query={reAuth{acessToken}}',
             {
               method: 'GET',
               credentials: 'include',
@@ -32,7 +32,7 @@ const errorLink = onError(
 )
 
 const UploadLink = createUploadLink({
-  uri: 'http://localhost:3000/api/graphql',
+  uri: '/api/graphql',
   credentials: 'include',
 })
 
