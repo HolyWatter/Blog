@@ -40,7 +40,7 @@ model MarkdownTag {
 model Posting {
   id       Int              @id @unique @default(autoincrement())
   title    String
-  text     String
+  text     String           @db.Text
   tag      PostingTags[]
   img      PostingImg[]
   created  String
@@ -66,7 +66,7 @@ model MarkdownImg {
 model Markdown {
   id          Int               @id @unique @default(autoincrement())
   title       String
-  text        String
+  text        String            @db.Text
   created     String
   comments    MarkdownComment[]
   author      User?             @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -77,7 +77,7 @@ model Markdown {
 
 model PostingComment {
   id        Int      @id @unique @default(autoincrement())
-  text      String
+  text      String   @db.Text
   user_id   Int
   writer    User?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
   Posting   Posting? @relation(fields: [postingId], references: [id], onDelete: Cascade)
@@ -86,7 +86,7 @@ model PostingComment {
 
 model MarkdownComment {
   id         Int       @id @unique @default(autoincrement())
-  text       String
+  text       String    @db.Text
   user_id    Int
   writer     User?     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   Markdown   Markdown? @relation(fields: [markdownId], references: [id], onDelete: Cascade)
@@ -95,7 +95,7 @@ model MarkdownComment {
 
 model GuestBook {
   id      Int    @id @unique @default(autoincrement())
-  text    String
+  text    String @db.Text
   user_id Int
   created String
   writer  User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
