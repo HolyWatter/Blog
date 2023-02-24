@@ -108,7 +108,7 @@ const resolvers = {
       if (currentUser) {
         return currentUser
       } else {
-          throw new Error ('')
+        throw new Error('')
       }
     },
   },
@@ -283,6 +283,22 @@ const resolvers = {
       { email, password, nickname, user_name, thumbnail },
       _ctx
     ) => {
+      const checkEmail = await client.User.findUnique({
+        where: {
+          email,
+        },
+      })
+      const checkNickname = await client.User.findUnique({
+        where: {
+          nickname,
+        },
+      })
+      if (checkEmail) {
+        throw new Error('이미 등록된 이메일입니다.')
+      }
+      if (checkNickname) {
+        throw new Error('이미 등록된 닉네임입니다.')
+      }
       const hashPassword = await bcrypt.hash(password, 12)
       if (thumbnail) {
         const key = `${Date.now()}`
