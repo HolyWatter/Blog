@@ -71,7 +71,7 @@ export default function Posting({ posting, refetch }: Props) {
 
 
   return (
-    <div className="my-5 max-w-[450px] rounded-md border min-w-[450px]">
+    <div className="my-5 rounded-md border">
       <div className="flex flex-col justify-center space-y-3 py-2 pl-3">
         <div className="flex justify-between pt-1 pr-2">
           <p>{posting.author.nickname}</p>
@@ -96,7 +96,7 @@ export default function Posting({ posting, refetch }: Props) {
         </div>
         <p className="text-xs text-gray-500">{timeFormat}</p>
       </div>
-      <div>{posting.img && <SwiperComponents img={posting.img} />}</div>
+      <div className='min-w-[100px] max-w-[450px] sm-m:max-w-[300px]'>{posting.img && <SwiperComponents img={posting.img} />}</div>
       <div className="border-b"></div>
       <div className="py-3 pl-3">
         <div className="flex items-center space-x-5">

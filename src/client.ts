@@ -25,7 +25,10 @@ const errorLink = onError(
               Authorization: localStorage.getItem('token'),
             },
           })
+        }else{
+          alert(message)
         }
+        
         return forward(operation)
       })
   }

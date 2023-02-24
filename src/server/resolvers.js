@@ -108,7 +108,7 @@ const resolvers = {
       if (currentUser) {
         return currentUser
       } else {
-        throw new Error('유저정보가 없습니다.')
+        throw new Error('로그인이 필요합니다.')
       }
     },
   },
@@ -284,28 +284,39 @@ const resolvers = {
       _ctx
     ) => {
       const hashPassword = await bcrypt.hash(password, 12)
-      const key = `${Date.now()}`
-      await new AWS.S3()
-        .putObject({
-          Body: Buffer.from(
-            thumbnail.replace(/^data:image\/\w+;base64,/, ''),
-            'base64'
-          ),
-          Bucket: 'holywater-blog',
-          Key: key,
-          ACL: 'public-read',
-        })
-        .promise()
+      if (thumbnail) {
+        const key = `${Date.now()}`
+        await new AWS.S3()
+          .putObject({
+            Body: Buffer.from(
+              thumbnail.replace(/^data:image\/\w+;base64,/, ''),
+              'base64'
+            ),
+            Bucket: 'holywater-blog',
+            Key: key,
+            ACL: 'public-read',
+          })
+          .promise()
 
-      await client.User.create({
-        data: {
-          email,
-          nickname,
-          user_name,
-          password: hashPassword,
-          thumbnail_url: `https://holywater-blog.s3.ap-northeast-1.amazonaws.com/${key}`,
-        },
-      })
+        await client.User.create({
+          data: {
+            email,
+            nickname,
+            user_name,
+            password: hashPassword,
+            thumbnail_url: `https://holywater-blog.s3.ap-northeast-1.amazonaws.com/${key}`,
+          },
+        })
+      } else {
+        await client.User.create({
+          data: {
+            email,
+            nickname,
+            user_name,
+            password: hashPassword,
+          },
+        })
+      }
     },
     login: async (_parent, { email, password }, { res }) => {
       const loginUser = await client.User.findUnique({
@@ -338,9 +349,9 @@ const resolvers = {
         }
       )
       //7일
-      let expireDate = new Date();
+      let expireDate = new Date()
       expireDate.setDate(expireDate.getDate() + 7)
-      
+
       res.setHeader(
         'Set-Cookie',
         `refreshToken=${refreshToken};expires=${expireDate.toUTCString()};path=/;`
@@ -370,7 +381,7 @@ const resolvers = {
     },
     addPosting: async (_, { title, text, img, tag }, { currentUser }) => {
       if (!currentUser) {
-        throw new Error('유저정보가 없습니다.')
+        throw new Error('로그인이 필요합니다.')
       }
       let posting = await client.Posting.create({
         data: {
@@ -417,7 +428,7 @@ const resolvers = {
       { currentUser }
     ) => {
       if (!currentUser) {
-        throw new Error('유저정보가 없습니다.')
+        throw new Error('로그인이 필요합니다.')
       }
       return client.PostingComment.create({
         data: {
@@ -443,7 +454,7 @@ const resolvers = {
       { currentUser }
     ) => {
       if (!currentUser) {
-        throw new Error('유저정보가 없습니다.')
+        throw new Error('로그인이 필요합니다.')
       }
       const markdown = await client.Markdown.create({
         data: {
@@ -490,7 +501,7 @@ const resolvers = {
       { currentUser }
     ) => {
       if (!currentUser) {
-        throw new Error('유저정보가 없습니다.')
+        throw new Error('로그인이 필요합니다.')
       }
       return client.MarkdownComment.create({
         data: {

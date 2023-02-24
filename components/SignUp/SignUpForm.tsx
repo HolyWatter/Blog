@@ -31,7 +31,7 @@ export default function SignUpForm({
   return (
     <form
       onSubmit={submitForm}
-      className="my-5 mx-auto flex w-[400px] flex-col justify-center space-y-5"
+      className="my-5 mx-auto flex w-full flex-col justify-center space-y-5"
     >
       <Input
         onChange={inputInfo}

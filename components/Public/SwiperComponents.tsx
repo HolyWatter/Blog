@@ -5,7 +5,6 @@ import 'swiper/css/pagination'
 import 'swiper/css/navigation'
 import Image from 'next/image'
 
-
 interface Props {
   img: { id: number; location: string }[]
 }
@@ -21,14 +20,8 @@ export default function SwiperComponents({ img }: Props) {
     >
       {img.map((item) => (
         <SwiperSlide key={item.id}>
-          <div className="">
-            <Image
-            width={400}
-            height={200}
-              alt=""
-              className="max-h-[400px] w-full bg-cover"
-              src={`${item.location}`}
-            />
+          <div className="w-full min-h-[200px]">
+            <Image fill alt="" src={`${item.location}`} />
           </div>
         </SwiperSlide>
       ))}

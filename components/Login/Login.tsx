@@ -77,10 +77,10 @@ export default function Login({ refetch }: Props) {
 
   return (
     <div className="absolute top-0 right-0 bottom-0 left-0 z-30 h-screen w-full bg-black/70">
-      <div className="absolute top-[50%] left-[50%] flex translate-y-[-50%] translate-x-[-50%] flex-col items-center rounded-sm border bg-white py-10 px-10">
+      <div className="absolute top-[50%] left-[50%] flex translate-y-[-50%] translate-x-[-50%] flex-col items-center rounded-sm border bg-white py-10 px-10 xs:w-[330px]">
         <button
           onClick={closeModal}
-          className="absolute top-2 right-3 text-gray-600"
+          className="absolute top-5 right-3 text-gray-600"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -97,8 +97,8 @@ export default function Login({ refetch }: Props) {
             />
           </svg>
         </button>
-        <p className="py-5 text-3xl font-semibold">성수의 블로그 로그인</p>
-        <p className="py-5 text-sm text-gray-500">
+        <p className="py-5 text-3xl font-semibold whitespace-nowrap">성수의 블로그 로그인</p>
+        <p className="py-5 text-sm text-gray-500 text-center">
           회원가입 및 로그인하시면 간단한 댓글작성 및 방명록작성이 가능합니다
         </p>
         <LoginForm submitForm={submitForm} info={info} inputInfo={inputInfo} />

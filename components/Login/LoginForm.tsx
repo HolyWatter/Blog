@@ -13,7 +13,7 @@ export default function LoginForm({ submitForm, inputInfo, info }: Props) {
   return (
     <form
       onSubmit={submitForm}
-      className="my-5 mx-auto flex w-[400px] flex-col justify-center space-y-5"
+      className="my-5 mx-auto flex w-full flex-col justify-center space-y-5"
     >
       <Input
         placeholder="이메일을 입력하세요"

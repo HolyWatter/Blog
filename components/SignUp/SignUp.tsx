@@ -84,10 +84,10 @@ export default function SignUp() {
 
   return (
     <div className="absolute top-0 right-0 bottom-0 left-0 h-screen w-full bg-black/70 z-30">
-      <div className="absolute top-[50%] left-[50%] flex max-h-[800px] translate-y-[-50%] translate-x-[-50%] flex-col items-center overflow-y-auto rounded-sm border bg-white py-10 px-10">
+      <div className="absolute top-[50%] left-[50%] flex max-h-[700px] translate-y-[-50%] translate-x-[-50%] flex-col items-center overflow-y-auto rounded-sm border bg-white py-10 px-10 xs-m:w-[330px] sm:w-[450px] ">
         <button
           onClick={closeModal}
-          className="absolute top-2 right-3 text-gray-600"
+          className="absolute top-5 right-3 text-gray-600"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -104,8 +104,8 @@ export default function SignUp() {
             />
           </svg>
         </button>
-        <p className="py-5 text-3xl font-semibold">성수의 블로그 회원가입</p>
-        <p className="py-5 text-sm text-gray-500">
+        <p className="py-5 text-3xl font-semibold whitespace-nowrap">성수의 블로그 회원가입</p>
+        <p className="py-5 text-sm text-gray-500 text-center">
           회원가입 및 로그인하시면 간단한 댓글작성 및 방명록작성이 가능합니다
         </p>
         <SignUpForm
