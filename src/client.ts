@@ -10,7 +10,7 @@ const errorLink = onError(
       graphQLErrors.forEach(async ({ message, locations, path }) => {
         if (message === EXPIRE_MESSAGE) {
           await fetch(
-            'http://localhost:3000/api/server?query={reAuth{acessToken}}',
+            'https://blog-nu-neon.vercel.app/api/server?query={reAuth{acessToken}}',
             {
               method: 'GET',
               credentials: 'include',
