@@ -108,7 +108,7 @@ const resolvers = {
       if (currentUser) {
         return currentUser
       } else {
-        throw new Error('로그인이 필요합니다.')
+          throw new Error ('')
       }
     },
   },
