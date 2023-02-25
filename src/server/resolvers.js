@@ -24,7 +24,7 @@ const resolvers = {
         },
         process.env.SECRET_KEY,
         {
-          expiresIn: '10s',
+          expiresIn: '2h',
         }
       )
       return { acessToken }
@@ -353,7 +353,7 @@ const resolvers = {
         },
         process.env.SECRET_KEY,
         {
-          expiresIn: '10s',
+          expiresIn: '2h',
         }
       )
       const refreshToken = jwt.sign(
