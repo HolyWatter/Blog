@@ -9,26 +9,22 @@ const errorLink = onError(
     if (graphQLErrors)
       graphQLErrors.forEach(async ({ message, locations, path }) => {
         if (message === EXPIRE_MESSAGE) {
-          await fetch(
-            '/api/server?query={reAuth{acessToken}}',
-            {
-              method: 'GET',
-              credentials: 'include',
-            }
-          )
+          await fetch('/api/graphql?query={reAuth{acessToken}}', {
+            method: 'GET',
+            credentials: 'include',
+          })
             .then((res) => res.json())
-            .then((res) =>
-              localStorage.setItem('token', res.data.reAuth.acessToken)
-            )
+          .then((res) =>
+            localStorage.setItem('token', res.data.reAuth.acessToken)
+          )
           operation.setContext({
             headers: {
               Authorization: localStorage.getItem('token'),
             },
           })
-        }else if(message === ''){
+        } else if (message === '') {
           return null
-        }
-        else{
+        } else {
           alert(message)
         }
         return forward(operation)

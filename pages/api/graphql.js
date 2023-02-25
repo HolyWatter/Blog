@@ -42,7 +42,7 @@ const server = new ApolloServer({
     const token = req.headers.authorization || ''
     let refresh
     if (req.headers.cookie) {
-      refresh = getCookieRefresh('refresh', req.headers.cookie)
+      refresh = getCookieRefresh('refreshToken', req.headers.cookie)
     }
     const user = checkToken(token)
     let currentUser

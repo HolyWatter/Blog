@@ -17,18 +17,17 @@ const resolvers = {
       const isValid = jwt.verify(refresh, process.env.SECRET_KEY)
       if (!isValid) {
         throw new Error('asdf')
-      } else {
-        const acessToken = jwt.sign(
-          {
-            email: isValid.email,
-          },
-          process.env.SECRET_KEY,
-          {
-            expiresIn: '2h',
-          }
-        )
-        return { acessToken }
       }
+      const acessToken = jwt.sign(
+        {
+          email: isValid.email,
+        },
+        process.env.SECRET_KEY,
+        {
+          expiresIn: '10s',
+        }
+      )
+      return { acessToken }
     },
     myPage: (_parent, _arg, { currentUser }) => {
       return client.User.findUnique({
@@ -354,7 +353,7 @@ const resolvers = {
         },
         process.env.SECRET_KEY,
         {
-          expiresIn: '2h',
+          expiresIn: '10s',
         }
       )
       const refreshToken = jwt.sign(
