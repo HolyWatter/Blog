@@ -1,7 +1,6 @@
 import { gql, useQuery } from '@apollo/client'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { useRecoilValue } from 'recoil'
 import Log from '../../components/MyPage/Log'
 import { ModifyProfile } from '../../components/MyPage/ModifyProfile'
 import { UserInfo } from '../../components/MyPage/UserInfo'
@@ -60,21 +59,12 @@ export default function Mypage() {
     refetch()
   }, [currentUser])
 
-  console.log(currentUser)
   useEffect(() => {
-    if (!currentUser.currentUser) {
+    if (!currentUser?.currentUser) {
       alert('로그인이 필요합니다.')
       router.push('/')
     }
   }, [currentUser])
-
-  useEffect(() => {
-    if (isModifyProfile) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isModifyProfile])
 
   return (
     <div className="mx-auto mt-10 max-w-[700px] px-10">

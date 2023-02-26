@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { SignUpInfo } from '../../src/interface'
 import { Input } from '../Public/AuthInput'
 import CropProfile from './CropProfile'
@@ -18,7 +18,7 @@ export default function SignUpForm({
 }: Props) {
   const [img, setImg] = useState<string>()
 
-  const selectImg = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const selectImg = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const img = e.target.files![0]
     const reader = new FileReader()
     reader.readAsDataURL(img)
@@ -26,7 +26,7 @@ export default function SignUpForm({
       const { currentTarget } = finishedEvent
       setImg((currentTarget as any).result)
     }
-  }
+  }, [])
 
   return (
     <form
@@ -63,7 +63,9 @@ export default function SignUpForm({
       />
 
       <div className="relative border py-7 px-3">
-        <p className="px-2 absolute top-[-10px] text-gray-400 bg-white">프로필 사진을 등록하세요</p>
+        <p className="absolute top-[-10px] bg-white px-2 text-gray-400">
+          프로필 사진을 등록하세요
+        </p>
         <input
           className="pb-4"
           onChange={selectImg}

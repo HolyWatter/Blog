@@ -5,11 +5,12 @@ import {
   useMutation,
   useQuery,
 } from '@apollo/client'
-import { useState } from 'react'
-import { CommentType } from '../../src/interface'
-import { DeleteModal } from '../Aside/Modal/DeleteModal'
-import { ModifyModal } from '../Aside/Modal/ModifyModal'
-import DeleteAndModifyBtn from '../Public/DeleteAndModifyBtn'
+import { useCallback, useState } from 'react'
+import { CommentType } from '../../../src/interface'
+import { DeleteModal } from '../../Aside/Modal/DeleteModal'
+import { ModifyModal } from '../../Aside/Modal/ModifyModal'
+import DeleteAndModifyBtn from '../../Public/DeleteAndModifyBtn'
+import { CURRENTUSER } from '../../../src/gql/currentUser'
 
 interface Props {
   comment: CommentType
@@ -19,29 +20,18 @@ interface Props {
 }
 
 const DELETE = gql`
-  mutation deletePostingComment($id: Int!){
-    deletePostingComment(id :$id){
+  mutation deletePostingComment($id: Int!) {
+    deletePostingComment(id: $id) {
       id
     }
   }
 `
 
 const Modify = gql`
-  mutation modifyPostingComment($id:Int! $text:String!){
-    modifyPostingComment(id :$id text:$text){
+  mutation modifyPostingComment($id: Int!, $text: String!) {
+    modifyPostingComment(id: $id, text: $text) {
       id
       text
-    }
-  }
-`
-
-const CURRENTUSER = gql`
-  query currentUser {
-    currentUser {
-      nickname
-      email
-      role
-      thumbnail_url
     }
   }
 `
@@ -49,38 +39,39 @@ const CURRENTUSER = gql`
 export default function PostingComments({ comment, refetch }: Props) {
   const [isDeleteComment, setIsDeleteComment] = useState<boolean>(false)
   const [isModifyComment, setIsModifyComment] = useState<boolean>(false)
-  const [modifyText, setModifyText] = useState<string>("")
+  const [modifyText, setModifyText] = useState<string>('')
 
   const [deleteMutation] = useMutation(DELETE)
   const [modifyMutation] = useMutation(Modify)
-  const {data} = useQuery(CURRENTUSER)
+  const { data } = useQuery(CURRENTUSER)
 
-  const clickDelete = () => {
+  const clickDelete = useCallback(() => {
     setIsDeleteComment((prev) => !prev)
-  }
-  const clickModify = () => {
-    setIsModifyComment((prev) => !prev)
-    setModifyText("")
-  }
+  }, [])
 
-  const clickConfirmDelete = async () => {
+  const clickModify = useCallback(() => {
+    setIsModifyComment((prev) => !prev)
+    setModifyText('')
+  }, [])
+
+  const clickConfirmDelete = useCallback(async () => {
     await deleteMutation({
       variables: { id: comment.id },
     })
     alert('삭제되었습니다.')
     refetch()
-  }
+  }, [])
 
-  const clickConfirmModify = async () =>{
+  const clickConfirmModify = useCallback(async () => {
     await modifyMutation({
-      variables :{
-        id : comment.id,
-        text : modifyText
-      }
+      variables: {
+        id: comment.id,
+        text: modifyText,
+      },
     })
-    alert("수정되었습니다.")
+    alert('수정되었습니다.')
     clickModify()
-  }
+  }, [modifyText])
 
   return (
     <div key={comment.id} className="flex w-full space-x-3">
@@ -95,10 +86,21 @@ export default function PostingComments({ comment, refetch }: Props) {
         )}
       </div>
       {isDeleteComment && (
-        <DeleteModal message="댓글"clickClose={clickDelete} clickConfirm={clickConfirmDelete} />
+        <DeleteModal
+          message="댓글"
+          clickClose={clickDelete}
+          clickConfirm={clickConfirmDelete}
+        />
       )}
-      {isModifyComment && 
-        <ModifyModal value={modifyText} setFunction={setModifyText} message="댓글" clickClose={clickModify} clickConfirm={clickConfirmModify} />}
+      {isModifyComment && (
+        <ModifyModal
+          value={modifyText}
+          setFunction={setModifyText}
+          message="댓글"
+          clickClose={clickModify}
+          clickConfirm={clickConfirmModify}
+        />
+      )}
     </div>
   )
 }

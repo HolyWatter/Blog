@@ -1,7 +1,7 @@
-import { gql, useApolloClient, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { loginModal, signupModal } from '../../src/Atom'
 import { moveBtnFunction } from '../../src/function/moveBtnFunction'
@@ -9,47 +9,24 @@ import Login from '../Login/Login'
 import SignUp from '../SignUp/SignUp'
 import { DownArrow } from '../svg/DownArrow'
 import { Menu } from './Menu'
-
-const CURRENTUSER = gql`
-  query currentUser {
-    currentUser {
-      nickname
-      email
-      role
-      thumbnail_url
-    }
-  }
-`
+import { CURRENTUSER } from '../../src/gql/currentUser'
 
 export const Nav = () => {
   const [isMenu, setIsMenu] = useState<boolean>(false)
   const isLoginModal = useRecoilValue(loginModal)
   const isSignupModal = useRecoilValue(signupModal)
   const setLoginModal = useSetRecoilState(loginModal)
-  const router = useRouter()
-  const client = useApolloClient()
-
-  const clickLogin = () => {
-    setLoginModal(true)
-  }
-
   const { data, refetch } = useQuery(CURRENTUSER)
 
-  const clickProfile = () => {
-    setIsMenu((prev) => !prev)
-  }
+  const router = useRouter()
 
-  const logout = async () => {
-    localStorage.removeItem('token')
-    alert('로그아웃되었습니다.')
-    setIsMenu(false)
-    client.writeQuery({
-      query: CURRENTUSER,
-      data: {
-        currentUser: null,
-      },
-    })
-  }
+  const clickLogin = useCallback(() => {
+    setLoginModal(true)
+  }, [])
+
+  const clickProfile = useCallback(() => {
+    setIsMenu((prev) => !prev)
+  }, [])
 
   return (
     <div>
@@ -57,7 +34,7 @@ export const Nav = () => {
         <button
           value="/"
           onClick={(e) => moveBtnFunction(e, router.push)}
-          className="text-2xl font-normal text-gray-300"
+          className="whitespace-nowrap text-2xl font-normal text-gray-300"
         >
           성수의 블로그
         </button>
@@ -85,10 +62,10 @@ export const Nav = () => {
             로그인
           </button>
         )}
-        {isLoginModal && <Login refetch={refetch} />}
-        {isSignupModal && <SignUp />}
       </div>
-      {isMenu && <Menu logout={logout} setIsMenu={setIsMenu} />}
+      {isLoginModal && <Login refetch={refetch} />}
+      {isSignupModal && <SignUp />}
+      {isMenu && <Menu setIsMenu={setIsMenu} />}
     </div>
   )
 }

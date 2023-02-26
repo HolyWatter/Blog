@@ -1,13 +1,13 @@
 import { ApolloQueryResult, gql, useMutation } from '@apollo/client'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 const WRITECOMMENT = gql`
   mutation addMarkdownComment($text: String!, $markdownId: Int!) {
     addMarkdownComment(text: $text, markdownId: $markdownId) {
       id
       text
-      writer{
+      writer {
         nickname
       }
     }
@@ -26,31 +26,28 @@ interface Props {
 
 export default function DevelopCommentForm({ refetch }: Props) {
   const [commentText, setCommentText] = useState('')
+  const router = useRouter()
 
-  const router = useRouter();
+  const [writeMutation] = useMutation(WRITECOMMENT)
 
-  const [writeMutation] = useMutation(WRITECOMMENT, {
-    context: {
-      headers: {
-        Authorization: localStorage.getItem('token'),
-      },
-    },
-  })
-  const inputText = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const inputText = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setCommentText(e.target.value)
-  }
+  }, [])
 
-  const submitCommentForm = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    await writeMutation({
-      variables: {
-        text: commentText,
-        markdownId: parseInt(router.query.id as string),
-      },
-    })
-    setCommentText('')
-    refetch()
-  }
+  const submitCommentForm = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+      await writeMutation({
+        variables: {
+          text: commentText,
+          markdownId: parseInt(router.query.id as string),
+        },
+      })
+      setCommentText('')
+      refetch()
+    },
+    [commentText]
+  )
 
   return (
     <form

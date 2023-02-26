@@ -1,4 +1,3 @@
-
 import {
   ApolloQueryResult,
   gql,
@@ -6,11 +5,16 @@ import {
   useMutation,
   useQuery,
 } from '@apollo/client'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
+import { changeTimeFormatFunction } from '../../src/function/changeTimeFormatFunction'
 import { PostingType } from '../../src/interface'
 import SwiperComponents from '../Public/SwiperComponents'
-import PostingComments from './PostingComments'
-import { PostingModal } from './PostingModal'
+import { MoreMark } from '../svg/MoreMark'
+import { PostingModal } from './PostingComponents/PostingModal'
+import { CURRENTUSER } from '../../src/gql/currentUser'
+import { DeleteModal } from '../Aside/Modal/DeleteModal'
+import { PostingCommentForm } from './PostingComponents/PostingCommentForm'
+import PostingComments from './PostingComponents/PostingComments'
 
 interface Props {
   posting: PostingType
@@ -27,13 +31,11 @@ const ADDCOMMENT = gql`
     }
   }
 `
-const CURRENTUSER = gql`
-  query currentUser {
-    currentUser {
-      nickname
-      email
-      role
-      thumbnail_url
+
+const DELETEPOSTING = gql`
+  mutation deletePosting($id: Int!) {
+    deletePosting(id: $id) {
+      id
     }
   }
 `
@@ -41,62 +43,64 @@ const CURRENTUSER = gql`
 export default function Posting({ posting, refetch }: Props) {
   const [comment, setComment] = useState('')
   const [isModal, setIsModal] = useState<boolean>(false)
-  const {data} = useQuery(CURRENTUSER);
+  const [isDelete, setIsDelete] = useState<boolean>(false)
+  const [isModify, setIsModify] = useState<boolean>(false)
+  const { data } = useQuery(CURRENTUSER)
   const [addComment] = useMutation(ADDCOMMENT)
 
-  const date = new Date(posting.created)
-  const timeFormat = new Intl.DateTimeFormat('KR', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(date)
-  const inputComment = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setComment(e.target.value)
-  }
+  const [deletePosting, { data: deleteData }] = useMutation(DELETEPOSTING, {
+    variables: {
+      id: posting.id,
+    },
+  })
 
-  const submitComment = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    await addComment({
-      variables: {
-        text: comment,
-        postingId: posting.id,
-      },
-    })
-    setComment('')
+  const clickDelete = async () => {
+    await deletePosting()
+    alert('삭제되었습니다.')
     refetch()
   }
 
-  const clickModalBtn = () => {
+  const time = changeTimeFormatFunction(posting.created)
+
+  const inputComment = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setComment(e.target.value)
+  }, [])
+
+  const submitComment = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+      await addComment({
+        variables: {
+          text: comment,
+          postingId: posting.id,
+        },
+      })
+      setComment('')
+      refetch()
+    },
+    [comment]
+  )
+
+  const clickModalBtn = useCallback(() => {
     setIsModal((prev) => !prev)
-  }
-
-
+  }, [])
+  
   return (
-    <div className="my-5 rounded-md border">
+    <div className="my-5 w-[450px] rounded-md border sm-m:max-w-[300px]">
       <div className="flex flex-col justify-center space-y-3 py-2 pl-3">
         <div className="flex justify-between pt-1 pr-2">
           <p>{posting.author.nickname}</p>
           {posting?.author?.nickname === data?.currentUser?.nickname && (
             <button onClick={clickModalBtn} className="pr-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="h-6 w-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-                />
-              </svg>
+              <MoreMark />
             </button>
           )}
         </div>
-        <p className="text-xs text-gray-500">{timeFormat}</p>
+        <p className="text-xs text-gray-500">{time}</p>
       </div>
-      <div className='min-w-[100px] max-w-[450px] sm-m:max-w-[300px]'>{posting.img && <SwiperComponents img={posting.img} />}</div>
+      <div className="min-w-[100px] max-w-[450px] sm-m:max-w-[300px]">
+        {posting.img && <SwiperComponents img={posting.img} />}
+      </div>
       <div className="border-b"></div>
       <div className="py-3 pl-3">
         <div className="flex items-center space-x-5">
@@ -125,18 +129,25 @@ export default function Posting({ posting, refetch }: Props) {
           />
         ))}
       </div>
-      <form className="flex w-full" onSubmit={submitComment}>
-        <input
-          onChange={inputComment}
-          value={comment}
-          placeholder="댓글을 입력하세요"
-          className="w-[85%] rounded-md py-1 pl-3"
+      <PostingCommentForm
+        submitComment={submitComment}
+        inputComment={inputComment}
+        comment={comment}
+      />
+      {isModal && (
+        <PostingModal
+          clickClose={clickModalBtn}
+          setIsDelete={setIsDelete}
+          setIsModify={setIsModify}
         />
-        <button className="w-[15%] rounded-md bg-origin py-1 px-2 font-light text-white">
-          입력
-        </button>
-      </form>
-      {isModal && <PostingModal clickClose={clickModalBtn}/>}
+      )}
+      {isDelete && (
+        <DeleteModal
+          message="게시글"
+          clickClose={() => setIsDelete((prev) => !prev)}
+          clickConfirm={clickDelete}
+        />
+      )}
     </div>
   )
 }
