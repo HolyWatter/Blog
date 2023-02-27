@@ -2,15 +2,15 @@ import {
   ApolloQueryResult,
   gql,
   OperationVariables,
-  useApolloClient,
   useMutation,
   useQuery,
 } from '@apollo/client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { GuestBookType } from '../../src/interface'
 import DeleteAndModifyBtn from '../Public/DeleteAndModifyBtn'
 import { DeleteModal } from '../Aside/Modal/DeleteModal'
 import { ModifyModal } from '../Aside/Modal/ModifyModal'
+import { CURRENTUSER } from '../../src/gql/currentUser'
 import Image from 'next/image'
 
 interface Props {
@@ -37,17 +37,6 @@ const MODIFY = gql`
   }
 `
 
-const CURRENTUSER = gql`
-  query currentUser {
-    currentUser {
-      nickname
-      email
-      role
-      thumbnail_url
-    }
-  }
-`
-
 export default function GuestBookItem({ item, refetch }: Props) {
   const [isModify, setIsModify] = useState<boolean>(false)
   const [isDelete, setIsDelete] = useState<boolean>(false)
@@ -64,25 +53,25 @@ export default function GuestBookItem({ item, refetch }: Props) {
     }
   }, [deleteRes])
 
-  const clickModify = () => {
+  const clickModify = useCallback(() => {
     setIsModify((prev) => !prev)
     setModifyText('')
-  }
+  }, [])
 
-  const clickDelete = () => {
+  const clickDelete = useCallback(() => {
     setIsDelete((prev) => !prev)
-  }
+  }, [])
 
-  const confirmDelete = async () => {
+  const confirmDelete = useCallback(async () => {
     deleteMutation({
       variables: {
         id: item.id,
       },
     })
     clickDelete()
-  }
+  }, [])
 
-  const confirmModify = async () => {
+  const confirmModify = useCallback(async () => {
     modifyMutation({
       variables: {
         id: item.id,
@@ -91,7 +80,7 @@ export default function GuestBookItem({ item, refetch }: Props) {
     })
     alert('수정되었습니다.')
     clickModify()
-  }
+  }, [modifyText])
 
   return (
     <div className="mt-7 flex h-[180px] rounded-md border">
@@ -104,8 +93,8 @@ export default function GuestBookItem({ item, refetch }: Props) {
       />
       <div className="flex w-full flex-col px-2 pl-3 pt-3 font-semibold text-gray-800">
         <div className="flex w-full justify-between">
-          <p>{item.writer.nickname}</p>
-          {item.writer.nickname === currentUser?.currentUser.nickname && (
+          <p>{item?.writer?.nickname}</p>
+          {item?.writer?.nickname === currentUser?.currentUser?.nickname && (
             <DeleteAndModifyBtn
               clickModify={clickModify}
               clickDelete={clickDelete}

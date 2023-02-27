@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Markdown } from '../../components/Aside/Markdown/Markdown'
 import { gql, useMutation, useQuery } from '@apollo/client'
-import PostDevelopForm from '../../components/Develop/PostDevelop/PostDevelopForm'
+import { PostDevelopForm } from '../../components/Develop/PostDevelop/PostDevelopForm'
+import { BackMark } from '../../components/svg/BackMark'
+import { WhiteBtnOrigin } from '../../components/Public/Button/WhiteBtnOrigin'
 import { moveBtnFunction } from '../../src/function/moveBtnFunction'
 
 const ADDMARKDOWN = gql`
@@ -63,12 +65,13 @@ export default function PostDevelop() {
 
   useEffect(() => {
     if (data) {
+      alert('작성되었습니다.')
       router.push(`/develop/${data.addMarkdown.id}`)
     }
   }, [data])
 
-  const submitPost = (e: React.MouseEvent<HTMLButtonElement>) => {
-    addMarkdown({
+  const submitPost = useCallback(async () => {
+    await addMarkdown({
       variables: {
         title: contents.title,
         text: contents.text,
@@ -76,7 +79,7 @@ export default function PostDevelop() {
         img,
       },
     })
-  }
+  }, [contents, tagList, img])
 
   return (
     <div className="h-full w-full py-10 md:pr-10">
@@ -89,34 +92,16 @@ export default function PostDevelop() {
           tagList={tagList}
           img={img}
         />
-        <div className="fixed bottom-0 left-0 flex h-20 w-full items-center justify-between border-t bg-origin px-5 z-10">
+        <div className="fixed bottom-0 left-0 z-10 flex h-20 w-full items-center justify-between border-t bg-origin px-5">
           <button
             value="/develop"
             onClick={(e) => moveBtnFunction(e, router.push)}
             className="flex items-center space-x-3 text-xl text-white"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-              />
-            </svg>
+            <BackMark />
             <p>나가기</p>
           </button>
-          <button
-            onClick={submitPost}
-            className="rounded-md border bg-white py-2 px-3 text-origin"
-          >
-            글쓰기
-          </button>
+          <WhiteBtnOrigin onClick={submitPost}>글쓰기</WhiteBtnOrigin>
         </div>
       </div>
       <div className="mt-10 break-words align-top xl-m:hidden xl:ml-10 xl:inline-block xl:w-[40%]">

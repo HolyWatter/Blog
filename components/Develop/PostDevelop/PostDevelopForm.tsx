@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
+import { fileToBase64 } from '../../../src/function/fileToBase64'
+import { pressEnter, pressTab } from '../../../src/function/pressTabAndEnter'
 import { Contents } from '../../../src/interface'
 import ImgUploadSwiper from '../../Public/ImgUploadSwiper'
-import DevelopTagForm from './DevelopTagForm'
+import { DevelopTagForm } from './DevelopTagForm'
 
 interface Props {
   contents: Contents
@@ -12,86 +14,59 @@ interface Props {
   img: any
 }
 
-export default function PostDevelopForm({
+export const PostDevelopForm = ({
   contents,
   setContents,
   setImg,
   setTagList,
   tagList,
   img,
-}: Props) {
+}: Props) => {
   const [tag, setTag] = useState<string>('')
-  const pressTabKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.nativeEvent.isComposing) {
-      return
-    }
-    if (e.key === 'Tab') {
-      e.preventDefault()
-      const start: number | null = e.currentTarget.selectionStart
-      const end: number | null = e.currentTarget.selectionEnd
-      const value = e.currentTarget.value
-      e.currentTarget.value =
-        value.substring(0, start!) + '\t' + value.substring(end!)
-      e.currentTarget.selectionStart = e.currentTarget.selectionEnd = start! + 1
-      return false
-    }
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      const start: number | null = e.currentTarget.selectionStart
-      const end: number | null = e.currentTarget.selectionEnd
-      const value = e.currentTarget.value
-      e.currentTarget.value =
-        value.substring(0, start!) + '\n' + value.substring(end!)
-      e.currentTarget.selectionStart = e.currentTarget.selectionEnd = start! + 1
-      return false
-    }
-  }
+  const deleteTag = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      setTagList(tagList.filter((tag: string) => tag !== e.currentTarget.value))
+    },
+    [tagList]
+  )
 
-  const deleteTag = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setTagList(tagList.filter((tag: string) => tag !== e.currentTarget.value))
-  }
+  const inputContents = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target
+      setContents({
+        ...contents,
+        [name]: value,
+      })
+    },
+    [contents]
+  )
 
-  const inputContents = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target
-    setContents({
-      ...contents,
-      [name]: value,
-    })
-  }
-
-  const inputTag = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const inputTag = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setTag(e.target.value)
-  }
+  }, [])
 
-  const submitTagForm = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (tagList.includes(tag)) {
-      alert('이미 포함된 태그입니다.')
-      setTag('')
-    } else {
-      setTagList([...tagList, tag])
-      setTag('')
-    }
-  }
-
-  const selectImg = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileArr = Object.values(e.target.files as any)
-    let file
-    let newArr: any = []
-    for (let i in fileArr) {
-      file = fileArr[i]
-      const reader = new FileReader()
-      reader.readAsDataURL(file as any)
-      reader.onloadend = (finishedEvent) => {
-        const { currentTarget } = finishedEvent
-        newArr[i] = (currentTarget as any).result
-        setImg([...newArr])
+  const submitTagForm = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+      if (tagList.includes(tag)) {
+        alert('이미 포함된 태그입니다.')
+        setTag('')
+      } else {
+        setTagList([...tagList, tag])
+        setTag('')
       }
-    }
-  }
+    },
+    [tagList]
+  )
 
+  const selectImg = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const fileArr = Object.values(e.target.files as any)
+      fileToBase64(fileArr, setImg)
+    },
+    []
+  )
+  
   return (
     <div>
       <input
@@ -102,6 +77,7 @@ export default function PostDevelopForm({
         value={contents.title}
       />
       <DevelopTagForm
+        bg="bg-bg"
         deleteTag={deleteTag}
         inputTag={inputTag}
         tag={tag}
@@ -117,7 +93,10 @@ export default function PostDevelopForm({
       />
       {<ImgUploadSwiper img={img} />}
       <textarea
-        onKeyDown={pressTabKey}
+        onKeyDown={(e) => {
+          pressEnter(e)
+          pressTab(e)
+        }}
         onChange={inputContents}
         name="text"
         value={contents.text}

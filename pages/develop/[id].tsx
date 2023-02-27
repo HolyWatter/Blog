@@ -1,12 +1,14 @@
-import { gql, useMutation, useLazyQuery, useQuery } from "@apollo/client";
-import { useRouter } from "next/router";
-import { Markdown } from "../../components/Aside/Markdown/Markdown";
-import { CommentType } from "../../src/interface";
-import SwiperComponents from "../../components/Public/SwiperComponents";
-import DevelopCommentForm from "../../components/Develop/DevelopDetail/DevelopCommentForm";
-import DevelopComment from "../../components/Develop/DevelopDetail/DevelopComments";
-import { useEffect, useState } from "react";
-import { DeleteModal } from "../../components/Aside/Modal/DeleteModal";
+import { gql, useMutation, useLazyQuery, useQuery } from '@apollo/client'
+import { useRouter } from 'next/router'
+import { Markdown } from '../../components/Aside/Markdown/Markdown'
+import { CommentType } from '../../src/interface'
+import SwiperComponents from '../../components/Public/SwiperComponents'
+import DevelopCommentForm from '../../components/Develop/DevelopDetail/DevelopCommentForm'
+import DevelopComment from '../../components/Develop/DevelopDetail/DevelopComments'
+import { useCallback, useEffect, useState } from 'react'
+import { DeleteModal } from '../../components/Aside/Modal/DeleteModal'
+import { CURRENTUSER } from '../../src/gql/currentUser'
+import { changeTimeFormatFunction } from '../../src/function/changeTimeFormatFunction'
 
 const DETAIL = gql`
   query markdownDetail($id: Int!) {
@@ -37,7 +39,7 @@ const DETAIL = gql`
       }
     }
   }
-`;
+`
 
 const DELETE = gql`
   mutation deleteMarkdown($id: Int!) {
@@ -45,73 +47,60 @@ const DELETE = gql`
       id
     }
   }
-`;
-
-const CURRENTUSER = gql`
-  query currentUser {
-    currentUser {
-      nickname
-      email
-      role
-      thumbnail_url
-    }
-  }
 `
-export default function DevelopDetail() {
-  const [isDeleteModal, setIsDeleteModal] = useState<boolean>(false);
-  const router = useRouter();
-  const [getData, { data, loading, refetch }] = useLazyQuery(DETAIL);
-  const currentUser = useQuery(CURRENTUSER);
 
-  const [deleteMutation, deleteRes] = useMutation(DELETE);
+export default function DevelopDetail() {
+  const [isDeleteModal, setIsDeleteModal] = useState<boolean>(false)
+  const router = useRouter()
+  const currentUser = useQuery(CURRENTUSER)
+  const [deleteMutation, { data: deleteData }] = useMutation(DELETE)
+  const [getData, { data, loading, refetch }] = useLazyQuery(DETAIL)
 
   useEffect(() => {
     getData({
       variables: {
         id: parseInt(router.query.id as string),
       },
-    });
-  }, [router.isReady]);
-
-  const clickDelete = () => {
-    setIsDeleteModal((prev) => !prev);
-  };
+    })
+  }, [router.isReady])
 
   useEffect(() => {
-    if (deleteRes.data) {
-      alert("삭제되었습니다.");
-      router.push("/develop");
+    if (deleteData) {
+      alert('삭제되었습니다.')
+      router.push('/develop')
     }
-  }, [deleteRes]);
+  }, [deleteData])
 
-  const clickConfirm = async () => {
+  const clickDelete = useCallback(() => {
+    setIsDeleteModal((prev) => !prev)
+  }, [])
+
+  const clickConfirm = useCallback(async () => {
     await deleteMutation({
       variables: {
         id: data.markdownDetail.id,
       },
-    });
-  };
+    })
+  }, [data?.markdownDetail?.id])
 
   return (
-    <div className="py-16 md-m:px-3 md:px-[13%]">
+    <div className="py-16 md-m:px-3 sm-m:py-3 md:px-[13%]">
       {!loading && data && (
         <div>
           <div className="flex items-end justify-between border-b-2 border-origin">
             <p className=" pb-4 text-5xl font-semibold sm-m:text-4xl">
-              {data.markdownDetail.title}
+              {data?.markdownDetail?.title}
             </p>
           </div>
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center space-x-4 py-3">
-              <p className="text-xl">{data.markdownDetail.author.nickname}</p>
+              <p className="text-xl">{data?.markdownDetail?.author?.nickname}</p>
               <p className="text-sm text-gray-500">
-                {new Intl.DateTimeFormat("KR", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                }).format(new Date(data.markdownDetail.created))}
+                {changeTimeFormatFunction(data?.markdownDetail?.created)}
               </p>
             </div>
-            {currentUser?.data?.currentUser?.nickname === data.markdownDetail.author.nickname && (
+            {currentUser?.data?.currentUser?.nickname ===
+              data?.markdownDetail?.author?.nickname && (
               <div className="space-x-3">
                 <button onClick={clickDelete} className="underline">
                   삭제
@@ -123,29 +112,29 @@ export default function DevelopDetail() {
             )}
           </div>
           <div className="flex flex-wrap space-x-3">
-            {data.markdownDetail.MarkdownTag.map(
+            {data?.markdownDetail?.MarkdownTag?.map(
               (item: { id: number; tag: string }) => (
                 <p
                   className="mb-4 rounded-full bg-origin px-3 py-1 text-white"
-                  key={item.id}
+                  key={item?.id}
                 >
-                  {item.tag}
+                  {item?.tag}
                 </p>
               )
             )}
           </div>
           <div className="z-0 px-5">
-            {<SwiperComponents img={data.markdownDetail.MarkdownImg} />}
+            {<SwiperComponents img={data?.markdownDetail?.MarkdownImg} />}
           </div>
           <div className="py-[20px]">
-            <Markdown markdown={data.markdownDetail.text} />
+            <Markdown markdown={data?.markdownDetail?.text} />
           </div>
           <div className="space-y-3">
-            <p>{data.markdownDetail.comments.length} 개의 댓글</p>
+            <p>{data?.markdownDetail?.comments?.length} 개의 댓글</p>
             <DevelopCommentForm refetch={refetch} />
           </div>
           <div>
-            {data.markdownDetail.comments.map((comment: CommentType) => (
+            {data?.markdownDetail?.comments?.map((comment: CommentType) => (
               <DevelopComment
                 key={comment.id}
                 comment={comment}
@@ -163,5 +152,5 @@ export default function DevelopDetail() {
         />
       )}
     </div>
-  );
+  )
 }

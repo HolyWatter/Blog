@@ -27,7 +27,7 @@ export default function DevelopList() {
   }, [data])
 
   return (
-    <div className="h-full w-full md-m:px-2 py-3 md:px-[13%]">
+    <div className="h-full w-full md-m:px-2 py-3 md:px-[13%] sm:py-10">
       <div className="mx-auto flex flex-col">
         {!loading &&
           data?.allMarkdown.map((item: PostingType) => (

@@ -1,20 +1,20 @@
-import { ApolloQueryResult, gql, useMutation, useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { CommentType } from "../../../src/interface";
-import DeleteAndModifyBtn from "../../Public/DeleteAndModifyBtn";
-import { DeleteModal } from "../../Aside/Modal/DeleteModal";
-import { ModifyModal } from "../../Aside/Modal/ModifyModal";
+import { ApolloQueryResult, gql, useMutation, useQuery } from '@apollo/client'
+import { useCallback, useEffect, useState } from 'react'
+import { CommentType } from '../../../src/interface'
+import DeleteAndModifyBtn from '../../Public/DeleteAndModifyBtn'
+import { DeleteModal } from '../../Aside/Modal/DeleteModal'
+import { ModifyModal } from '../../Aside/Modal/ModifyModal'
+import { CURRENTUSER } from '../../../src/gql/currentUser'
 
 interface Props {
-  comment: CommentType;
+  comment: CommentType
   refetch: (
     variables?:
       | Partial<{
-          id: number;
+          id: number
         }>
       | undefined
-  ) => Promise<ApolloQueryResult<any>>;
+  ) => Promise<ApolloQueryResult<any>>
 }
 
 const DELETE = gql`
@@ -23,7 +23,8 @@ const DELETE = gql`
       id
     }
   }
-`;
+`
+
 const MODIFY = gql`
   mutation modifyMarkdownComment($id: Int!, $text: String!) {
     modifyMarkdownComment(id: $id, text: $text) {
@@ -31,60 +32,51 @@ const MODIFY = gql`
       text
     }
   }
-`;
-
-const CURRENTUSER = gql`
-  query currentUser {
-    currentUser {
-      nickname
-      email
-      role
-      thumbnail_url
-    }
-  }
 `
 
 export default function DevelopComment({ comment, refetch }: Props) {
-  const [isDeleteComment, setIsDeleteComment] = useState<boolean>(false);
-  const [isModify, setIsModify] = useState<boolean>(false);
-  const [modifyText, setModifyText] = useState<string>("");
-  const [deleteMutation, deleteRes] = useMutation(DELETE);
-  const [modifyMutation, modifyRes] = useMutation(MODIFY);
-  const {data}= useQuery(CURRENTUSER)
+  const [isDeleteComment, setIsDeleteComment] = useState<boolean>(false)
+  const [isModify, setIsModify] = useState<boolean>(false)
+  const [modifyText, setModifyText] = useState<string>('')
+  const [deleteMutation, deleteRes] = useMutation(DELETE)
+  const [modifyMutation, modifyRes] = useMutation(MODIFY)
+  const { data } = useQuery(CURRENTUSER)
 
-  const clickDelete = () => {
-    setIsDeleteComment((prev) => !prev);
-  };
-  const clickModify = () => {
-    setIsModify((prev) => !prev);
-    setModifyText("");
-  };
+  const clickDelete = useCallback(() => {
+    setIsDeleteComment((prev) => !prev)
+  }, [])
+
+  const clickModify = useCallback(() => {
+    setIsModify((prev) => !prev)
+    setModifyText('')
+  }, [])
 
   useEffect(() => {
     if (deleteRes.data) {
-      alert("댓글이 삭제되었습니다.");
-      refetch();
+      alert('댓글이 삭제되었습니다.')
+      refetch()
     }
-  }, [deleteRes]);
+  }, [deleteRes])
 
-  const clickDeleteConfirm = async () => {
+  const clickDeleteConfirm = useCallback(async () => {
     await deleteMutation({
       variables: {
         id: comment.id,
       },
-    });
-    clickDelete();
-  };
-  const clickModifyConfirm = async () => {
+    })
+    clickDelete()
+  }, [])
+
+  const clickModifyConfirm = useCallback(async () => {
     await modifyMutation({
       variables: {
         id: comment.id,
         text: modifyText,
       },
-    });
-    clickModify();
-    alert("수정되었습니다.");
-  };
+    })
+    clickModify()
+    alert('수정되었습니다.')
+  }, [modifyText])
 
   return (
     <div className="border-b py-5">
@@ -117,5 +109,5 @@ export default function DevelopComment({ comment, refetch }: Props) {
         />
       )}
     </div>
-  );
+  )
 }

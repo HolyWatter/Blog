@@ -270,12 +270,13 @@ const resolvers = {
           ACL: 'public-read',
         })
         .promise()
-      await client.User.update({
+      const user = await client.User.update({
         where: { id: currentUser.id },
         data: {
           thumbnail_url: `https://holywater-blog.s3.ap-northeast-1.amazonaws.com/${key}`,
         },
       })
+      return user
     },
     signup: async (
       _parent,

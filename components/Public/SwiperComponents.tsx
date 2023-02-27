@@ -18,9 +18,9 @@ export default function SwiperComponents({ img }: Props) {
       pagination={true}
       modules={[Pagination, Navigation]}
     >
-      {img.map((item) => (
+      {img.map((item, idx) => (
         <SwiperSlide key={item.id}>
-          <div className="w-full min-h-[200px]">
+          <div className="min-h-[200px] w-full">
             <Image fill alt="" src={`${item.location}`} />
           </div>
         </SwiperSlide>

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useCallback, useRef } from 'react'
 import Cropper from 'react-cropper'
 import 'cropperjs/dist/cropper.css'
 
@@ -10,11 +10,11 @@ interface Props {
 export default function CropProfile({ img, setProfileImg }: Props) {
   const cropperRef = useRef(null)
 
-  const onCrop = () => {
+  const onCrop = useCallback(() => {
     const imageElement: any = cropperRef?.current
     const cropper = imageElement?.cropper
     setProfileImg(cropper.getCroppedCanvas().toDataURL())
-  }
+  }, [])
 
   return (
     <div>
