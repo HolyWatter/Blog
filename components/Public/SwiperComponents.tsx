@@ -20,7 +20,7 @@ export default function SwiperComponents({ img }: Props) {
     >
       {img.map((item, idx) => (
         <SwiperSlide key={item.id}>
-          <div className="min-h-[200px] w-full">
+          <div className="min-h-[300px] w-full">
             <Image fill alt="" src={`${item.location}`} />
           </div>
         </SwiperSlide>

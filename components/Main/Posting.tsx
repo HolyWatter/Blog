@@ -84,7 +84,7 @@ export default function Posting({ posting, refetch }: Props) {
   const clickModalBtn = useCallback(() => {
     setIsModal((prev) => !prev)
   }, [])
-  
+
   return (
     <div className="my-5 w-[450px] rounded-md border sm-m:max-w-[300px]">
       <div className="flex flex-col justify-center space-y-3 py-2 pl-3">
@@ -98,7 +98,7 @@ export default function Posting({ posting, refetch }: Props) {
         </div>
         <p className="text-xs text-gray-500">{time}</p>
       </div>
-      <div className="min-w-[100px] max-w-[450px] sm-m:max-w-[300px]">
+      <div className="min-w-[100px] max-w-[450px] sm-m:max-h-[300px] sm-m:max-w-[300px]">
         {posting.img && <SwiperComponents img={posting.img} />}
       </div>
       <div className="border-b"></div>
