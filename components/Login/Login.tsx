@@ -40,16 +40,12 @@ export default function Login({ refetch }: Props) {
   const [login, { error, data }] = useMutation(LOGIN)
 
   useEffect(() => {
-    if (error) {
-      alert(error.message)
-    }
     if (data?.login.message) {
       localStorage.setItem('token', data.login.acessToken)
-      alert(data.login.message)
       setLoginModal((prev) => !prev)
       refetch()
     }
-  }, [error, data])
+  }, [data])
 
   const inputInfo = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +61,13 @@ export default function Login({ refetch }: Props) {
   const submitForm = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
-      await login({ variables: info })
+      if(info.email ===""){
+        alert("이메일을 입력해주세요")
+      }
+      else if(info.password ===""){
+        alert("비밀번호를 입력해주세요")
+      }
+      else await login({ variables: info })
     },
     [info]
   )

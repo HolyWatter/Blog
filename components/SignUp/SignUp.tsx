@@ -41,23 +41,31 @@ export default function SignUp() {
   const [profileImg, setProfileImg] = useState<string>()
   const setSignupModal = useSetRecoilState(signupModal)
   const setLoginModal = useSetRecoilState(loginModal)
-  const [signUp, { error, data }] = useMutation(SIGNUP)
+  const [signUp, { error, data, loading }] = useMutation(SIGNUP)
 
   useEffect(() => {
     if (data?.signup === null) {
       alert('회원가입되었습니다.')
       toLogin()
     }
-    if (error?.message.includes('User_email_key'))
-      return alert('이미 사용중인 이메일입니다.')
-    if (error?.message.includes('User_nickname_key'))
-      return alert('이미 사용중인 닉네임입니다.')
-  }, [error?.message, data])
+  }, [data])
 
   const submitForm = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
-      await signUp({ variables: { ...info, thumbnail: profileImg } })
+      if(info.email === ""){
+        alert('이메일을 입력해주세요.')
+      }
+      else if(info.password === ""){
+        alert('비밀번호를 입력해주세요.')
+      }
+      else if(info.nickname === ""){
+        alert('닉네임을 입력해주세요.')
+      }
+      else if(info.user_name === ""){
+        alert('이름을 입력해주세요')
+      }
+      else await signUp({ variables: { ...info, thumbnail: profileImg } })
     },
     [info, profileImg]
   )
@@ -81,6 +89,7 @@ export default function SignUp() {
   const closeModal = useCallback(() => {
     setSignupModal((prev) => !prev)
   }, [])
+
   return (
     <ModalBg>
       <div className="absolute top-[50%] left-[50%] flex max-h-[700px] translate-y-[-50%] translate-x-[-50%] flex-col items-center overflow-y-auto rounded-sm border bg-white py-10 px-10 xs-m:w-[330px] sm:w-[450px] ">
